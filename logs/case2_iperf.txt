@@ -1,0 +1,19 @@
+*** No default OpenFlow controller found for default switch!
+*** Falling back to OVS Bridge
+*** Creating network
+*** Adding controller
+*** Adding hosts:
+g1 h1 h2 h3 h4 h5 h6 
+*** Adding switches:
+s1 
+*** Adding links:
+(g1, s1) (h1, s1) (h2, s1) (h3, s1) (h4, s1) (h5, s1) (h6, s1) 
+*** Configuring hosts
+g1 h1 h2 h3 h4 h5 h6 
+*** Starting controller
+
+*** Starting 1 switches
+s1 ...
+*** Waiting for switches to connect
+s1 
+*** Iperf: testing TCP bandwidth between g1 and h6 

@@ -1,0 +1,411 @@
+[2025-10-29 23:38:38] ===============================================
+[2025-10-29 23:38:38] [INFO] Bắt đầu chạy Case 2 - Kiểm thử IoT Topology
+[2025-10-29 23:38:38] ===============================================
+[2025-10-29 23:38:39] [OK] Topology khởi tạo thành công!
+[2025-10-29 23:38:41] [TEST] Kiểm tra kết nối ping giữa h1 và h6...
+[2025-10-29 23:38:47] [RESULT] Tỉ lệ mất gói ping = 100.00%
+[2025-10-29 23:38:47] [TEST] Đang đo băng thông TCP bằng iperf...
+[2025-10-29 23:38:50] [ERROR] Không thể đo băng thông: Could not connect to iperf on port 5001
+[2025-10-29 23:38:50] [INFO] Bảng định tuyến (routing table) của h1:
+[2025-10-29 23:38:50] Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+10.0.0.0        0.0.0.0         255.255.255.0   U     0      0        0 h1-eth0
+
+[2025-10-29 23:38:50] [INFO] Bảng định tuyến (routing table) của h6:
+[2025-10-29 23:44:53] ===============================================
+[2025-10-29 23:44:53] [INFO] Bắt đầu chạy Case 2 - Kiểm thử IoT Topology
+[2025-10-29 23:44:53] ===============================================
+[2025-10-29 23:44:54] [OK] Topology khởi tạo thành công!
+[2025-10-29 23:44:54] [INFO] Chờ controller kết nối và cài flow...
+[2025-10-29 23:44:59] [TEST] Kiểm tra kết nối ping giữa h1 và h6...
+[2025-10-29 23:45:05] [RESULT] Tỉ lệ mất gói ping = 100.00%
+[2025-10-29 23:45:05] [TEST] Đang đo băng thông TCP bằng iperf...
+[2025-10-29 23:45:08] [ERROR] Không thể đo băng thông: Could not connect to iperf on port 5001
+[2025-10-29 23:45:08] [INFO] Bảng định tuyến (routing table) của h1:
+[2025-10-29 23:45:08] Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+10.0.0.0        0.0.0.0         255.255.255.0   U     0      0        0 h1-eth0
+
+[2025-10-29 23:45:08] [INFO] Bảng định tuyến (routing table) của h6:
+[2025-10-29 23:51:51] ===============================================
+[2025-10-29 23:51:51] [INFO] Bắt đầu chạy Case 2 - Kiểm thử IoT Topology
+[2025-10-29 23:51:51] ===============================================
+[2025-10-29 23:51:52] [OK] Topology khởi tạo thành công!
+[2025-10-29 23:51:52] [INFO] Chờ controller kết nối và cài đặt flow...
+[2025-10-29 23:51:57] [TEST] Kiểm tra kết nối ping giữa h1 và h6...
+[2025-10-29 23:52:03] [RESULT] Tỉ lệ mất gói ping = 100.00%
+[2025-10-29 23:52:03] [TEST] Đang đo băng thông TCP bằng iperf...
+[2025-10-29 23:52:06] [ERROR] Không thể đo băng thông: Could not connect to iperf on port 5001
+[2025-10-29 23:52:06] [INFO] Bảng định tuyến (routing table) của h1:
+[2025-10-29 23:52:06] Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+10.0.0.0        0.0.0.0         255.255.255.0   U     0      0        0 h1-eth0
+
+[2025-10-29 23:52:06] [INFO] Bảng định tuyến (routing table) của h6:
+[2025-10-29 23:52:06] [WARN] Không thể lấy route h6: 
+[2025-10-29 23:52:06] [INFO] Luồng OVS (flow table) của s1:
+[2025-10-29 23:52:06] 
+[2025-10-29 23:52:06] [INFO] Dừng mạng Mininet và dọn dẹp...
+[2025-10-29 23:52:06] [WARN] Dừng mạng gặp lỗi: 
+[2025-10-29 23:52:06] [DONE] Test Case 2 hoàn tất!
+
+
+[2025-10-30 00:07:12] ===============================================
+[2025-10-30 00:07:12] [INFO] Bắt đầu chạy Case 2 - Kiểm thử IoT Topology
+[2025-10-30 00:07:12] ===============================================
+[2025-10-30 00:07:13] [OK] Topology khởi tạo thành công!
+[2025-10-30 00:07:13] [INFO] Chờ controller kết nối và cài đặt flow...
+[2025-10-30 00:07:18] [TEST] Kiểm tra kết nối ping giữa h1 và h6...
+[2025-10-30 00:07:24] [RESULT] Tỉ lệ mất gói ping = 100.00%
+[2025-10-30 00:07:24] [TEST] Đang đo băng thông TCP bằng iperf...
+[2025-10-30 00:07:27] [ERROR] Không thể đo băng thông: Could not connect to iperf on port 5001
+[2025-10-30 00:07:27] [INFO] Bảng định tuyến (routing table) của h1:
+[2025-10-30 00:07:27] Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+10.0.0.0        0.0.0.0         255.255.255.0   U     0      0        0 h1-eth0
+
+[2025-10-30 00:07:27] [INFO] Bảng định tuyến (routing table) của h6:
+[2025-10-30 00:07:27] [WARN] Không thể lấy route h6: 
+[2025-10-30 00:07:27] [INFO] Luồng OVS (flow table) của s1:
+[2025-10-30 00:07:27] 
+[2025-10-30 00:07:27] [INFO] Dừng mạng Mininet và dọn dẹp...
+[2025-10-30 00:07:27] [WARN] Dừng mạng gặp lỗi: 
+[2025-10-30 00:07:27] [DONE] Test Case 2 hoàn tất!
+
+
+[2025-10-30 00:09:24] ===============================================
+[2025-10-30 00:09:24] [INFO] Bắt đầu chạy Case 2 - Kiểm thử IoT Topology
+[2025-10-30 00:09:24] ===============================================
+[2025-10-30 00:09:24] [OK] Topology khởi tạo thành công!
+[2025-10-30 00:09:24] [INFO] Chờ controller kết nối và cài đặt flow...
+[2025-10-30 00:09:29] [TEST] Kiểm tra kết nối ping giữa h1 và h6...
+[2025-10-30 00:09:29] [INFO] Ping warm-up để controller học flow...
+[2025-10-30 00:09:41] [RESULT] Tỉ lệ mất gói ping = 100.00%
+[2025-10-30 00:09:41] [TEST] Đang đo băng thông TCP bằng iperf...
+[2025-10-30 00:09:44] [ERROR] Không thể đo băng thông: Could not connect to iperf on port 5001
+[2025-10-30 00:09:44] [INFO] Bảng định tuyến (routing table) của h1:
+[2025-10-30 00:09:44] Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+10.0.0.0        0.0.0.0         255.255.255.0   U     0      0        0 h1-eth0
+
+[2025-10-30 00:09:44] [INFO] Bảng định tuyến (routing table) của h6:
+[2025-10-30 00:09:44] [WARN] Không thể lấy route h6: 
+[2025-10-30 00:09:44] [INFO] Luồng OVS (flow table) của s1:
+[2025-10-30 00:09:44] 
+[2025-10-30 00:09:44] [INFO] Dừng mạng Mininet và dọn dẹp...
+[2025-10-30 00:09:44] [WARN] Dừng mạng gặp lỗi: 
+[2025-10-30 00:09:44] [DONE] Test Case 2 hoàn tất!
+
+
+[2025-10-30 00:10:59] ===============================================
+[2025-10-30 00:10:59] [INFO] Bắt đầu chạy Case 2 - Kiểm thử IoT Topology
+[2025-10-30 00:10:59] ===============================================
+[2025-10-30 00:10:59] [OK] Topology khởi tạo thành công!
+[2025-10-30 00:10:59] [INFO] Chờ controller kết nối và cài đặt flow...
+[2025-10-30 00:11:04] [TEST] Kiểm tra kết nối ping giữa h1 và h6...
+[2025-10-30 00:11:04] [INFO] Ping warm-up để controller học flow...
+[2025-10-30 00:11:15] [RESULT] Tỉ lệ mất gói ping = 100.00%
+[2025-10-30 00:11:15] [TEST] Đang đo băng thông TCP bằng iperf...
+[2025-10-30 00:11:18] [ERROR] Không thể đo băng thông: Could not connect to iperf on port 5001
+[2025-10-30 00:11:18] [INFO] Bảng định tuyến (routing table) của h1:
+[2025-10-30 00:11:18] Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+10.0.0.0        0.0.0.0         255.255.255.0   U     0      0        0 h1-eth0
+
+[2025-10-30 00:11:18] [INFO] Bảng định tuyến (routing table) của h6:
+[2025-10-30 00:11:18] [WARN] Không thể lấy route h6: 
+[2025-10-30 00:11:18] [INFO] Luồng OVS (flow table) của s1:
+[2025-10-30 00:11:18] 
+[2025-10-30 00:11:18] [INFO] Dừng mạng Mininet và dọn dẹp...
+[2025-10-30 00:11:18] [WARN] Dừng mạng gặp lỗi: 
+[2025-10-30 00:11:18] [DONE] Test Case 2 hoàn tất!
+
+
+[2025-10-30 00:14:49] ===============================================
+[2025-10-30 00:14:49] [INFO] Bắt đầu chạy Case 2 - Kiểm thử IoT Topology
+[2025-10-30 00:14:49] ===============================================
+[2025-10-30 00:14:50] [OK] Topology khởi tạo thành công!
+[2025-10-30 00:14:50] [INFO] Chờ controller kết nối và cài đặt flow...
+[2025-10-30 00:14:55] [TEST] Kiểm tra kết nối ping giữa h1 và h6...
+[2025-10-30 00:14:55] [INFO] Ping warm-up để controller học flow...
+[2025-10-30 00:15:06] [RESULT] Tỉ lệ mất gói ping = 100.00%
+[2025-10-30 00:15:06] [TEST] Đang đo băng thông TCP bằng iperf...
+[2025-10-30 00:15:09] [ERROR] Không thể đo băng thông: Could not connect to iperf on port 5001
+[2025-10-30 00:15:09] [INFO] Bảng định tuyến (routing table) của h1:
+[2025-10-30 00:15:09] Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+10.0.0.0        0.0.0.0         255.255.255.0   U     0      0        0 h1-eth0
+
+[2025-10-30 00:15:09] [INFO] Bảng định tuyến (routing table) của h6:
+[2025-10-30 00:15:09] [WARN] Không thể lấy route h6: 
+[2025-10-30 00:15:09] [INFO] Luồng OVS (flow table) của s1:
+[2025-10-30 00:15:09] 
+[2025-10-30 00:15:09] [INFO] Dừng mạng Mininet và dọn dẹp...
+[2025-10-30 00:15:09] [WARN] Dừng mạng gặp lỗi: 
+[2025-10-30 00:15:09] [DONE] Test Case 2 hoàn tất!
+
+
+[2025-10-30 00:18:34] ===============================================
+[2025-10-30 00:18:34] [INFO] Bắt đầu chạy Case 2 - Kiểm thử IoT Topology
+[2025-10-30 00:18:34] ===============================================
+[2025-10-30 00:18:35] [OK] Topology khởi tạo thành công!
+[2025-10-30 00:18:35] [INFO] Chờ controller kết nối và cài đặt flow...
+[2025-10-30 00:18:40] [TEST] Kiểm tra kết nối ping giữa h1 và h6...
+[2025-10-30 00:18:40] [INFO] Ping warm-up để controller học flow...
+[2025-10-30 00:18:51] [RESULT] Tỉ lệ mất gói ping = 100.00%
+[2025-10-30 00:18:51] [TEST] Đang đo băng thông TCP bằng iperf...
+[2025-10-30 00:18:54] [ERROR] Không thể đo băng thông: Could not connect to iperf on port 5001
+[2025-10-30 00:18:54] [INFO] Bảng định tuyến (routing table) của h1:
+[2025-10-30 00:18:54] Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+10.0.0.0        0.0.0.0         255.255.255.0   U     0      0        0 h1-eth0
+
+[2025-10-30 00:18:54] [INFO] Bảng định tuyến (routing table) của h6:
+[2025-10-30 00:18:54] [WARN] Không thể lấy route h6: 
+[2025-10-30 00:18:54] [INFO] Luồng OVS (flow table) của s1:
+[2025-10-30 00:18:54] 
+[2025-10-30 00:18:54] [INFO] Dừng mạng Mininet và dọn dẹp...
+[2025-10-30 00:18:54] [WARN] Dừng mạng gặp lỗi: 
+[2025-10-30 00:18:54] [DONE] Test Case 2 hoàn tất!
+
+
+[2025-10-30 00:20:24] ===============================================
+[2025-10-30 00:20:24] [INFO] Bắt đầu chạy Case 2 - Kiểm thử IoT Topology
+[2025-10-30 00:20:24] ===============================================
+[2025-10-30 00:20:24] [OK] Topology khởi tạo thành công!
+[2025-10-30 00:20:24] [INFO] Chờ controller kết nối và cài đặt flow...
+[2025-10-30 00:20:29] [TEST] Kiểm tra kết nối ping giữa h1 và h6...
+[2025-10-30 00:20:29] [INFO] Ping warm-up để controller học flow...
+[2025-10-30 00:20:40] [RESULT] Tỉ lệ mất gói ping = 100.00%
+[2025-10-30 00:20:40] [TEST] Đang đo băng thông TCP bằng iperf...
+[2025-10-30 00:20:43] [ERROR] Không thể đo băng thông: Could not connect to iperf on port 5001
+[2025-10-30 00:20:43] [INFO] Bảng định tuyến (routing table) của h1:
+[2025-10-30 00:20:43] Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+10.0.0.0        0.0.0.0         255.255.255.0   U     0      0        0 h1-eth0
+
+[2025-10-30 00:20:43] [INFO] Bảng định tuyến (routing table) của h6:
+[2025-10-30 00:20:43] [WARN] Không thể lấy route h6: 
+[2025-10-30 00:20:43] [INFO] Luồng OVS (flow table) của s1:
+[2025-10-30 00:20:43] 
+[2025-10-30 00:20:43] [INFO] Dừng mạng Mininet và dọn dẹp...
+[2025-10-30 00:20:44] [WARN] Dừng mạng gặp lỗi: 
+[2025-10-30 00:20:44] [DONE] Test Case 2 hoàn tất!
+
+
+[2025-10-30 00:26:08] ===============================================
+[2025-10-30 00:26:08] [INFO] Bắt đầu chạy Case 2 - Kiểm thử IoT Topology
+[2025-10-30 00:26:08] ===============================================
+[2025-10-30 00:26:08] [OK] Topology khởi tạo thành công!
+[2025-10-30 00:26:09] [INFO] Chờ controller kết nối và cài đặt flow...
+[2025-10-30 00:26:14] [TEST] Kiểm tra kết nối ping giữa h1 và h6...
+[2025-10-30 00:26:14] [INFO] Ping warm-up để controller học flow...
+[2025-10-30 00:26:25] [RESULT] Tỉ lệ mất gói ping = 100.00%
+[2025-10-30 00:26:25] [TEST] Đang đo băng thông TCP bằng iperf...
+[2025-10-30 00:26:28] [ERROR] Không thể đo băng thông: Could not connect to iperf on port 5001
+[2025-10-30 00:26:28] [INFO] Bảng định tuyến (routing table) của h1:
+[2025-10-30 00:26:28] Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+10.0.0.0        0.0.0.0         255.255.255.0   U     0      0        0 h1-eth0
+
+[2025-10-30 00:26:28] [INFO] Bảng định tuyến (routing table) của h6:
+[2025-10-30 00:26:28] [WARN] Không thể lấy route h6: 
+[2025-10-30 00:26:28] [INFO] Luồng OVS (flow table) của s1:
+[2025-10-30 00:26:28] 
+[2025-10-30 00:26:28] [INFO] Dừng mạng Mininet và dọn dẹp...
+[2025-10-30 00:26:28] [WARN] Dừng mạng gặp lỗi: 
+[2025-10-30 00:26:28] [DONE] Test Case 2 hoàn tất!
+
+
+[2025-10-30 00:28:46] ===============================================
+[2025-10-30 00:28:46] [INFO] Bắt đầu chạy Case 2 - Kiểm thử IoT Topology
+[2025-10-30 00:28:46] ===============================================
+[2025-10-30 00:28:46] [OK] Topology khởi tạo thành công!
+[2025-10-30 00:28:46] [INFO] Chờ controller kết nối và cài đặt flow...
+[2025-10-30 00:28:51] [TEST] Kiểm tra kết nối ping giữa h1 và h6...
+[2025-10-30 00:28:51] [INFO] Ping warm-up để controller học flow...
+[2025-10-30 00:29:02] [RESULT] Tỉ lệ mất gói ping = 100.00%
+[2025-10-30 00:29:02] [TEST] Đang đo băng thông TCP bằng iperf...
+[2025-10-30 00:29:05] [ERROR] Không thể đo băng thông: Could not connect to iperf on port 5001
+[2025-10-30 00:29:05] [INFO] Bảng định tuyến (routing table) của h1:
+[2025-10-30 00:29:05] Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+10.0.0.0        0.0.0.0         255.255.255.0   U     0      0        0 h1-eth0
+
+[2025-10-30 00:29:05] [INFO] Bảng định tuyến (routing table) của h6:
+[2025-10-30 00:29:05] [WARN] Không thể lấy route h6: 
+[2025-10-30 00:29:05] [INFO] Luồng OVS (flow table) của s1:
+[2025-10-30 00:29:05] 
+[2025-10-30 00:29:05] [INFO] Dừng mạng Mininet và dọn dẹp...
+[2025-10-30 00:29:05] [WARN] Dừng mạng gặp lỗi: 
+[2025-10-30 00:29:05] [DONE] Test Case 2 hoàn tất!
+
+
+[2025-10-30 14:28:12] ===============================================
+[2025-10-30 14:28:12] [INFO] Bắt đầu chạy Case 2 - Kiểm thử IoT Topology
+[2025-10-30 14:28:12] ===============================================
+[2025-10-30 14:28:13] [OK] Topology khởi tạo thành công!
+[2025-10-30 14:28:13] [INFO] Chờ controller kết nối và cài đặt flow...
+[2025-10-30 14:28:18] [TEST] Kiểm tra kết nối ping giữa h1 và h6...
+[2025-10-30 14:28:18] [INFO] Ping warm-up để controller học flow...
+[2025-10-30 14:28:29] [RESULT] Tỉ lệ mất gói ping = 100.00%
+[2025-10-30 14:28:29] [TEST] Đang đo băng thông TCP bằng iperf...
+[2025-10-30 14:28:32] [ERROR] Không thể đo băng thông: Could not connect to iperf on port 5001
+[2025-10-30 14:28:32] [INFO] Bảng định tuyến (routing table) của h1:
+[2025-10-30 14:28:32] Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+10.0.0.0        0.0.0.0         255.255.255.0   U     0      0        0 h1-eth0
+
+[2025-10-30 14:28:32] [INFO] Bảng định tuyến (routing table) của h6:
+[2025-10-30 14:28:32] [WARN] Không thể lấy route h6: 
+[2025-10-30 14:28:32] [INFO] Luồng OVS (flow table) của s1:
+[2025-10-30 14:28:32] 
+[2025-10-30 14:28:32] [INFO] Dừng mạng Mininet và dọn dẹp...
+[2025-10-30 14:28:32] [WARN] Dừng mạng gặp lỗi: 
+[2025-10-30 14:28:32] [DONE] Test Case 2 hoàn tất!
+
+
+[2025-10-30 14:37:31] ===============================================
+[2025-10-30 14:37:31] [INFO] Bắt đầu chạy Case 2 - Kiểm thử IoT Topology
+[2025-10-30 14:37:31] ===============================================
+[2025-10-30 14:37:31] [OK] Topology khởi tạo thành công!
+[2025-10-30 14:37:31] [INFO] Chờ controller kết nối và cài đặt flow...
+[2025-10-30 14:37:36] [TEST] Kiểm tra kết nối ping giữa h1 và h6...
+[2025-10-30 14:37:36] [INFO] Ping warm-up để controller học flow...
+[2025-10-30 14:37:48] [RESULT] Tỉ lệ mất gói ping = 100.00%
+[2025-10-30 14:37:48] [TEST] Đang đo băng thông TCP bằng iperf...
+[2025-10-30 14:37:51] [ERROR] Không thể đo băng thông: Could not connect to iperf on port 5001
+[2025-10-30 14:37:51] [INFO] Bảng định tuyến (routing table) của h1:
+[2025-10-30 14:37:51] Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+10.0.0.0        0.0.0.0         255.255.255.0   U     0      0        0 h1-eth0
+
+[2025-10-30 14:37:51] [INFO] Bảng định tuyến (routing table) của h6:
+[2025-10-30 14:37:51] [WARN] Không thể lấy route h6: 
+[2025-10-30 14:37:51] [INFO] Luồng OVS (flow table) của s1:
+[2025-10-30 14:37:51] 
+[2025-10-30 14:37:51] [INFO] Dừng mạng Mininet và dọn dẹp...
+[2025-10-30 14:37:51] [WARN] Dừng mạng gặp lỗi: 
+[2025-10-30 14:37:51] [DONE] Test Case 2 hoàn tất!
+
+
+[2025-10-30 14:38:03] ===============================================
+[2025-10-30 14:38:03] [INFO] Bắt đầu chạy Case 2 - Kiểm thử IoT Topology
+[2025-10-30 14:38:03] ===============================================
+[2025-10-30 14:38:03] [OK] Topology khởi tạo thành công!
+[2025-10-30 14:38:03] [INFO] Chờ controller kết nối và cài đặt flow...
+[2025-10-30 14:38:08] [TEST] Kiểm tra kết nối ping giữa h1 và h6...
+[2025-10-30 14:38:08] [INFO] Ping warm-up để controller học flow...
+[2025-10-30 14:38:19] [RESULT] Tỉ lệ mất gói ping = 100.00%
+[2025-10-30 14:38:19] [TEST] Đang đo băng thông TCP bằng iperf...
+[2025-10-30 14:38:23] [ERROR] Không thể đo băng thông: Could not connect to iperf on port 5001
+[2025-10-30 14:38:23] [INFO] Bảng định tuyến (routing table) của h1:
+[2025-10-30 14:38:23] Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+10.0.0.0        0.0.0.0         255.255.255.0   U     0      0        0 h1-eth0
+
+[2025-10-30 14:38:23] [INFO] Bảng định tuyến (routing table) của h6:
+[2025-10-30 14:38:23] [WARN] Không thể lấy route h6: 
+[2025-10-30 14:38:23] [INFO] Luồng OVS (flow table) của s1:
+[2025-10-30 14:38:23] 
+[2025-10-30 14:38:23] [INFO] Dừng mạng Mininet và dọn dẹp...
+[2025-10-30 14:38:23] [WARN] Dừng mạng gặp lỗi: 
+[2025-10-30 14:38:23] [DONE] Test Case 2 hoàn tất!
+
+
+[2025-10-30 14:52:25] ===============================================
+[2025-10-30 14:52:25] [INFO] Bắt đầu chạy Case 2 - Kiểm thử IoT Topology
+[2025-10-30 14:52:25] ===============================================
+[2025-10-30 14:52:25] [OK] Topology khởi tạo thành công!
+[2025-10-30 14:52:25] [INFO] Chờ controller kết nối và cài đặt flow...
+[2025-10-30 14:52:30] [TEST] Kiểm tra kết nối ping giữa h1 và h6...
+[2025-10-30 14:52:30] [INFO] Ping warm-up để controller học flow...
+[2025-10-30 14:52:35] [INFO] Dừng mạng Mininet và dọn dẹp...
+[2025-10-30 14:52:35] [DONE] Test Case 2 hoàn tất!
+
+
+[2025-10-30 14:52:39] ===============================================
+[2025-10-30 14:52:39] [INFO] Bắt đầu chạy Case 2 - Kiểm thử IoT Topology
+[2025-10-30 14:52:39] ===============================================
+[2025-10-30 14:52:39] [INFO] Đang khởi động Ryu controller: /home/npt/SDN_Qlearning_Project/controller/simple_controller.py
+[2025-10-30 15:00:44] ===============================================
+[2025-10-30 15:00:44] [INFO] Bắt đầu chạy Case 2 - Kiểm thử IoT Topology
+[2025-10-30 15:00:44] ===============================================
+[2025-10-30 15:00:44] [INFO] Đang khởi động Ryu controller: /home/npt/SDN_Qlearning_Project/controller/simple_controller.py
+[2025-10-30 15:00:44] [INFO] Chờ Ryu khởi động... (1/15)
+[2025-10-30 15:00:45] [OK] Ryu controller đã sẵn sàng trên cổng 6653!
+[2025-10-30 15:00:45] [OK] Topology khởi tạo thành công!
+[2025-10-30 15:00:45] [INFO] Chờ controller kết nối và cài đặt flow...
+[2025-10-30 15:00:53] [TEST] Kiểm tra kết nối ping giữa h1 và h6...
+[2025-10-30 15:00:53] [INFO] Ping warm-up để controller học flow...
+[2025-10-30 15:00:56] [RESULT] Tỉ lệ mất gói ping = 0.00%
+[2025-10-30 15:00:56] [TEST] Đang đo băng thông TCP bằng iperf...
+[2025-10-30 15:11:56] [INFO] Dừng mạng Mininet và dọn dẹp...
+[2025-10-30 15:11:56] [WARN] Dừng mạng gặp lỗi: 
+[2025-10-30 15:11:56] [INFO] Đã tắt Ryu controller.
+[2025-10-30 15:11:56] [DONE] Test Case 2 hoàn tất!
+
+
+[2025-10-30 15:12:01] ===============================================
+[2025-10-30 15:12:01] [INFO] Bắt đầu chạy Case 2 - Kiểm thử IoT Topology
+[2025-10-30 15:12:01] ===============================================
+[2025-10-30 15:12:01] [INFO] Đang khởi động Ryu controller: /home/npt/SDN_Qlearning_Project/controller/simple_controller.py
+[2025-10-30 15:12:01] [INFO] Chờ Ryu khởi động... (1/15)
+[2025-10-30 15:12:02] [OK] Ryu controller đã sẵn sàng trên cổng 6653!
+[2025-10-30 15:12:03] [OK] Topology khởi tạo thành công!
+[2025-10-30 15:12:03] [INFO] Chờ controller kết nối và cài đặt flow...
+[2025-10-30 15:12:11] [TEST] Kiểm tra kết nối ping giữa h1 và h6...
+[2025-10-30 15:12:11] [INFO] Ping warm-up để controller học flow...
+[2025-10-30 15:12:14] [RESULT] Tỉ lệ mất gói ping = 0.00%
+[2025-10-30 15:12:14] [TEST] Đang đo băng thông TCP bằng iperf...
+[2025-10-30 15:12:14] [ERROR] Không thể đo băng thông: Mininet.iperf() got an unexpected keyword argument 'timeout'
+[2025-10-30 15:12:14] [INFO] Bảng định tuyến của h1:
+[2025-10-30 15:12:14] Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+10.0.0.0        0.0.0.0         255.255.255.0   U     0      0        0 h1-eth0
+
+[2025-10-30 15:12:14] [INFO] Bảng định tuyến của h6:
+[2025-10-30 15:12:14] Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+10.0.0.0        0.0.0.0         255.255.255.0   U     0      0        0 h6-eth0
+
+[2025-10-30 15:12:14] [INFO] Luồng OVS (flow table) của s1:
+[2025-10-30 15:12:14]  cookie=0x0, duration=3.018s, table=0, n_packets=4, n_bytes=392, priority=1,in_port="s1-eth7",dl_src=00:00:00:00:00:07,dl_dst=00:00:00:00:00:02 actions=output:"s1-eth1"
+ cookie=0x0, duration=3.018s, table=0, n_packets=3, n_bytes=294, priority=1,in_port="s1-eth1",dl_src=00:00:00:00:00:02,dl_dst=00:00:00:00:00:07 actions=output:"s1-eth7"
+ cookie=0x0, duration=11.022s, table=0, n_packets=44, n_bytes=3684, priority=0 actions=CONTROLLER:65535
+
+[2025-10-30 15:12:14] [INFO] Dừng mạng Mininet và dọn dẹp...
+[2025-10-30 15:12:14] [INFO] Đã tắt Ryu controller.
+[2025-10-30 15:12:14] [DONE] Test Case 2 hoàn tất!
+
+
+[2025-10-30 15:15:38] ===============================================
+[2025-10-30 15:15:38] [INFO] Bắt đầu chạy Case 2 - Kiểm thử IoT Topology
+[2025-10-30 15:15:38] ===============================================
+[2025-10-30 15:15:38] [INFO] Đang khởi động Ryu controller: /home/npt/SDN_Qlearning_Project/controller/simple_controller.py
+[2025-10-30 15:15:39] [OK] Ryu controller đã sẵn sàng trên cổng 6653!
+[2025-10-30 15:15:39] [OK] Topology khởi tạo thành công!
+[2025-10-30 15:15:47] [TEST] Kiểm tra kết nối ping giữa h1 và h6...
+[2025-10-30 15:15:50] [RESULT] Tỉ lệ mất gói ping = 0.00%
+[2025-10-30 15:15:50] [TEST] Đang đo băng thông UDP bằng iperf (3s)...
+[2025-10-30 15:15:53] [RESULT] Băng thông trung bình giữa h1-h6: ['10M', '10.5 Mbits/sec', '10.5 Mbits/sec']
+[2025-10-30 15:15:53] [INFO] Bảng định tuyến của h1:
+[2025-10-30 15:15:53] Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+10.0.0.0        0.0.0.0         255.255.255.0   U     0      0        0 h1-eth0
+
+[2025-10-30 15:15:53] [INFO] Bảng định tuyến của h6:
+[2025-10-30 15:15:53] Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+10.0.0.0        0.0.0.0         255.255.255.0   U     0      0        0 h6-eth0
+
+[2025-10-30 15:15:53] [INFO] Luồng OVS (flow table) của s1:
+[2025-10-30 15:15:53]  cookie=0x0, duration=6.293s, table=0, n_packets=5, n_bytes=434, priority=1,in_port="s1-eth7",dl_src=00:00:00:00:00:07,dl_dst=00:00:00:00:00:02 actions=output:"s1-eth1"
+ cookie=0x0, duration=6.291s, table=0, n_packets=2672, n_bytes=4034352, priority=1,in_port="s1-eth1",dl_src=00:00:00:00:00:02,dl_dst=00:00:00:00:00:07 actions=output:"s1-eth7"
+ cookie=0x0, duration=13.800s, table=0, n_packets=44, n_bytes=3532, priority=0 actions=CONTROLLER:65535
+
+[2025-10-30 15:15:53] [INFO] Dừng mạng Mininet và dọn dẹp...
+[2025-10-30 15:15:53] [INFO] Đã tắt Ryu controller.
+[2025-10-30 15:15:53] [DONE] Test Case 2 hoàn tất!
+
+

@@ -37,8 +37,10 @@ class QLearningSDNController(app_manager.RyuApp):
     # === Hàm lưu Q-table ra file ===
     def save_qtable(self):
         try:
+            # Sửa lỗi bằng cách chuyển keys (tuple) thành chuỗi string
+            q_table_str = {str(key): value for key, value in self.q_table.items()}
             with open(self.save_path, "w") as f:
-                json.dump(self.q_table, f, indent=2)
+                json.dump(q_table_str, f, indent=2)
             self.logger.info(f"💾 Q-table đã được lưu tại {self.save_path}")
         except Exception as e:
             self.logger.error(f"[ERROR] Không thể lưu Q-table: {e}")
@@ -92,23 +94,26 @@ class QLearningSDNController(app_manager.RyuApp):
         src, dst = eth.src, eth.dst
         state = (src, dst)
 
+        # Chuyển state (src, dst) thành string
+        state_str = str(state)
+
         # Khởi tạo hàng Q-table mới nếu chưa có
-        if state not in self.q_table:
-            self.q_table[state] = {a: 0 for a in self.actions}
+        if state_str not in self.q_table:
+            self.q_table[state_str] = {a: 0 for a in self.actions}
 
         # Chọn hành động (port) theo epsilon-greedy
         if random.random() < self.epsilon:
             action = random.choice(self.actions)
         else:
-            action = max(self.q_table[state], key=self.q_table[state].get)
+            action = max(self.q_table[state_str], key=self.q_table[state_str].get)
 
         # Cập nhật Q-value (mô phỏng reward)
         reward = random.uniform(-1, 1)
-        old_value = self.q_table[state][action]
-        next_max = max(self.q_table[state].values())
+        old_value = self.q_table[state_str][action]
+        next_max = max(self.q_table[state_str].values())
 
         new_value = old_value + self.learning_rate * (reward + self.discount * next_max - old_value)
-        self.q_table[state][action] = round(new_value, 4)
+        self.q_table[state_str][action] = round(new_value, 4)
 
         # === Lưu Q-table định kỳ ===
         if time.time() - self.last_save_time > self.save_interval:

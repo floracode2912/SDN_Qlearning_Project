@@ -1,0 +1,16 @@
+=> Chạy topo như bình thường rồi tại CLI, gõ lệnh gọi metrics: 
+py exec(open('metrics_case1.py').read())
+Sau đó điền: 
+Source: Tên điểm bắt đầu ( vd: h1 , gw, cloud , .....)
+Destination: Tên điểm đến ( vd: h1 , gw, cloud , .....)
+Sample: Số lượng test
+================================================
+Nếu thông số hop hiển thị 0 -> CÀI ĐẶT THÊM Traceout
+B1: Kiếm tra dns: cat /etc/resolv.conf
+*) Nếu hiện ra 'nameserver 8.8.8.8' -> qua B2
+*) Nếu không hiện, cái dns:
+sudo rm -f /etc/resolv.conf
+sudo touch /etc/resolv.conf
+echo "nameserver 8.8.8.8" | sudo tee /etc/resolv.conf
+B2: update traceroute: sudo apt-get update --fix-missing
+sudo apt-get install -y traceroute

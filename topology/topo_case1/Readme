@@ -1,0 +1,3 @@
+Chạy cả 3 file cùng một lúc với lệnh:
+sudo -E python3 iot_static_case1.py
+----------------------------------------------------

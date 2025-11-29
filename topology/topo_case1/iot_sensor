@@ -1,0 +1,46 @@
+import sys
+import time
+import random
+import json
+import urllib.request 
+
+if len(sys.argv) < 3:
+    print("Usage: python3 iot_sensor.py <id> <type>")
+    sys.exit(1)
+
+device_id = sys.argv[1]
+sensor_type = sys.argv[2] # temp, humid, motion
+url = "http://10.0.100.2:80"
+
+print(f"? Sensor {device_id} ({sensor_type}) started...")
+
+while True:
+    value = 0
+    if sensor_type == 'temp':
+        value = round(random.uniform(20.0, 35.0), 1)
+        if random.random() < 0.1: value = round(random.uniform(85.0, 100.0), 1)
+        
+    elif sensor_type == 'humid':
+        value = round(random.uniform(40.0, 90.0), 1)
+        
+    elif sensor_type == 'motion':
+        value = random.choice([0, 0, 0, 1]) 
+
+    data = {
+        "id": device_id,
+        "type": sensor_type,
+        "value": value
+    }
+
+    try:
+        req = urllib.request.Request(url)
+        req.add_header('Content-Type', 'application/json; charset=utf-8')
+        jsondata = json.dumps(data).encode('utf-8')
+        req.add_header('Content-Length', len(jsondata))
+        
+        response = urllib.request.urlopen(req, jsondata, timeout=2)
+        print(f"[{device_id}] Sent: {value}")
+    except Exception as e:
+        print(f"[{device_id}] Connection Error (Server chua san sang?)")
+
+    time.sleep(random.uniform(3, 6)) 

@@ -1,5 +1,6 @@
 import os
 import time
+from functools import partial
 from mininet.topo import Topo
 from mininet.node import Node, RemoteController, OVSKernelSwitch
 from mininet.net import Mininet
@@ -12,17 +13,17 @@ from mininet.log import setLogLevel, info
 # =======================================
 class SDNIoTTopo(Topo):
     def build(self):
-        g1 = self.addSwitch("g1", dpid="0000000000000100")
-        g2 = self.addSwitch("g2", dpid="0000000000000200")
+        g1 = self.addSwitch("g1",  protocols='OpenFlow13')
+        g2 = self.addSwitch("g2",  protocols='OpenFlow13')
 
         # Cloud server
         cloud = self.addHost("cloud", ip="10.0.100.2/24", defaultRoute="via 10.0.100.1")
 
         # Switches Access 
-        s1 = self.addSwitch("s1", dpid="0000000000000001")
-        s2 = self.addSwitch("s2", dpid="0000000000000002")
-        s3 = self.addSwitch("s3", dpid="0000000000000003")
-        s4 = self.addSwitch("s4", dpid="0000000000000004")
+        s1 = self.addSwitch("s1",  protocols='OpenFlow13')
+        s2 = self.addSwitch("s2",  protocols='OpenFlow13')
+        s3 = self.addSwitch("s3",  protocols='OpenFlow13')
+        s4 = self.addSwitch("s4",  protocols='OpenFlow13')
 
         # Links & IP Assignment
         bw_router = 10
@@ -70,7 +71,10 @@ class SDNIoTTopo(Topo):
 # =======================================
 def run():
     topo = SDNIoTTopo()
-    net = Mininet(topo=topo, controller=RemoteController, switch=OVSKernelSwitch, link=TCLink)
+    
+    switch_with_protocol = partial(OVSKernelSwitch, protocols='OpenFlow13')
+
+    net = Mininet(topo=topo, controller= None , switch=switch_with_protocol, link=TCLink)
              
     c0 = net.addController('c0', controller=RemoteController, ip='127.0.0.1', port=6633)
 
@@ -78,7 +82,7 @@ def run():
 
     info("\n=== SDN NETWORK STARTED ===\n")
     info("[!] Warning: You MUST run a Ryu/ONOS Controller for connectivity.\n")
-    info("    Example: ryu-manager ryu.app.simple_switch_13\n")
+    info("    Example: ryu-manager iot_controller.py\n")
     
     info("Waiting for controller connection...\n")
     time.sleep(3)
@@ -120,5 +124,4 @@ def run():
 
 if __name__ == "__main__":
     setLogLevel("info")
-    os.system("mn -c") 
     run()

@@ -1,269 +1,296 @@
-# -*- coding: utf-8 -*-
-import sys
+import json
 import time
-import ipaddress
-import networkx as nx
+import pprint
+from operator import attrgetter
 from ryu.base import app_manager
 from ryu.controller import ofp_event
-from ryu.controller.handler import CONFIG_DISPATCHER, MAIN_DISPATCHER, DEAD_DISPATCHER
+from ryu.controller.handler import CONFIG_DISPATCHER, MAIN_DISPATCHER
 from ryu.controller.handler import set_ev_cls
 from ryu.ofproto import ofproto_v1_3
-from ryu.lib.packet import packet, ethernet, ether_types, arp, ipv4, lldp
+from ryu.lib.packet import packet, ethernet, arp, ipv4, ether_types
 from ryu.lib import hub
-from ryu.lib.dpid import dpid_to_str, str_to_dpid
+from ryu.app.wsgi import ControllerBase, WSGIApplication, route
+from webob import Response
 
-# Ensure output encoding is UTF-8 to prevent crashes
-sys.stdout.reconfigure(encoding='utf-8')
+# --- CONFIGURATION ---
+CONGESTION_THRESHOLD = 4000000  # 4MB/s ~ 32Mbps (Warning Threshold)
+MONITOR_INTERVAL = 2            # Monitor every 2 seconds
 
-class UniversalRouter(app_manager.RyuApp):
+simple_switch_instance_name = 'simple_switch_api_app'
+url = '/router/{dpid}'
+
+# ANSI color codes for pretty logging
+class Colors:
+    RED = '\033[91m'
+    GREEN = '\033[92m'
+    YELLOW = '\033[93m'
+    BLUE = '\033[94m'
+    RESET = '\033[0m'
+
+class AntiLoopController(app_manager.RyuApp):
     OFP_VERSIONS = [ofproto_v1_3.OFP_VERSION]
+    _CONTEXTS = {'wsgi': WSGIApplication}
 
     def __init__(self, *args, **kwargs):
-        super(UniversalRouter, self).__init__(*args, **kwargs)
+        super(AntiLoopController, self).__init__(*args, **kwargs)
+        self.logger.info(f"{Colors.GREEN}--> [SYSTEM] Controller V2 Debug Ready.{Colors.RESET}")
         
-        # Initialize variables
-        self.datapaths = {} 
-        self.mac_to_port = {}        # {dpid: {mac: port}}
-        self.mac_to_dpid = {}        # {mac: dpid} - Global MAC map
-        self.ip_to_mac = {}          # {ip: mac}
-        self.network = nx.Graph()    # Topology Graph
-        
-        # ONE Virtual Gateway MAC for ALL subnets (Simplifies Routing Logic)
-        self.GW_MAC = '00:00:00:00:00:FE'
-        
-        # List of Gateway IPs (Must match your Topology)
-        # S1, S2, S3, S4 Gateways + Cloud Gateways + Backbone IPs
-        self.GW_IPS = [
-            '10.0.1.254', '10.0.2.254', '10.0.3.254', '10.0.4.254',
-            '10.0.100.1', '10.0.200.1',
-            '10.0.10.1', '10.0.10.2',
-            '10.0.20.1', '10.0.20.2'
-        ]
-        
-        # Start monitoring thread
-        self.monitor_thread = hub.spawn(self._monitor)
-        # Start discovery thread
-        self.discovery_thread = hub.spawn(self._discovery_loop)
-        
-        print("\n" + "="*60)
-        print("  CUSTOM IOT SDN CONTROLLER (SINGLE GW MAC)")
-        print("  - Topology: Tree (G1 Root, G2/G3 Branch)")
-        print(f"  - Virtual Gateway MAC: {self.GW_MAC}")
-        print("="*60 + "\n")
+        wsgi = kwargs['wsgi']
+        wsgi.register(RestRouterController, {simple_switch_instance_name: self})
 
-    # --- MONITORING LOOP ---
+        self.GATEWAY_MAC = "00:00:00:00:01:00"
+        self.CLOUD_MAC   = "00:00:00:00:00:FF" 
+        
+        self.datapaths = {}
+        self.groups_installed = {} 
+        self.prev_stats = {} 
+        self.monitor_thread = hub.spawn(self._monitor)
+
+        self.static_arp_table = {
+            "10.0.100.2": self.CLOUD_MAC,
+            "10.0.200.2": self.CLOUD_MAC,
+            "10.0.1.1": "00:00:00:00:00:01", "10.0.1.2": "00:00:00:00:00:02",
+            "10.0.1.3": "00:00:00:00:00:03", "10.0.2.4": "00:00:00:00:00:04",
+            "10.0.2.5": "00:00:00:00:00:05", "10.0.3.6": "00:00:00:00:00:06",
+            "10.0.3.7": "00:00:00:00:00:07", "10.0.4.8": "00:00:00:00:00:08",
+            "10.0.4.9": "00:00:00:00:00:09", "10.0.4.10": "00:00:00:00:00:0a",
+        }
+
+        # --- DEFAULT ROUTING TABLE ---
+        self.routing_table = {
+            # G1 (Switch 256)
+            256: { 
+                "10.0.100": 1, "10.0.200": 1, 
+                "10.0.1": 2, "10.0.2": 3, "10.0.3": 4, "10.0.4": 5
+            },
+            # G2 (Switch 512)
+            512: { "10.0.3": 2, "default": 1 },
+            # G3 (Switch 768)
+            768: { 
+                "10.0.4": 2,
+                "10.0.100": 1, # Default via G1
+                "10.0.200": 3, # Direct
+                "default": 1 
+            }
+        }
+        self.print_routing_table_pretty()
+
+    # --- FEATURE 1: PRETTY PRINT ROUTING TABLE ---
+    def print_routing_table_pretty(self):
+        print(f"\n{Colors.BLUE}{'='*60}")
+        print(f"{'CURRENT ROUTING TABLE (Static)':^60}")
+        print(f"{'='*60}{Colors.RESET}")
+        print(f"{'Switch ID':<15} | {'Dest Subnet/IP':<15} | {'Output Port':<10}")
+        print("-" * 46)
+        
+        for dpid, routes in self.routing_table.items():
+            first = True
+            for dest, port in routes.items():
+                sw_name = f"SW-{dpid}" if first else ""
+                print(f"{sw_name:<15} | {dest:<15} | {port:<10}")
+                first = False
+            print("-" * 46)
+        print("\n")
+
+    # --- FEATURE 2: MONITOR & CONGESTION WARNING ---
     def _monitor(self):
-        hub.sleep(2)
         while True:
             for dp in self.datapaths.values():
-                self._request_stats(dp)
-            hub.sleep(5)
+                if dp.id in [256, 768]: self._request_stats(dp)
+            hub.sleep(MONITOR_INTERVAL)
 
     def _request_stats(self, datapath):
         parser = datapath.ofproto_parser
-        req = parser.OFPFlowStatsRequest(datapath)
+        req = parser.OFPPortStatsRequest(datapath, 0, datapath.ofproto.OFPP_ANY)
         datapath.send_msg(req)
 
-    @set_ev_cls(ofp_event.EventOFPFlowStatsReply, MAIN_DISPATCHER)
-    def _flow_stats_reply_handler(self, ev):
+    @set_ev_cls(ofp_event.EventOFPPortStatsReply, MAIN_DISPATCHER)
+    def _port_stats_reply_handler(self, ev):
         body = ev.msg.body
-        for stat in sorted([flow for flow in body if flow.priority == 1],
-                           key=lambda flow: (flow.packet_count), reverse=True):
-            ip_src = stat.match.get('ipv4_src', 'N/A')
-            ip_dst = stat.match.get('ipv4_dst', 'N/A')
-            packet_count = stat.packet_count
-            if packet_count > 0:
-                print(f"Flow: {ip_src} -> {ip_dst} | Pkts: {packet_count}")
+        dpid = ev.msg.datapath.id
+        
+        for stat in body:
+            port_no = stat.port_no
+            if port_no > 100: continue 
+            
+            key = (dpid, port_no)
+            rx_bytes = stat.rx_bytes
+            tx_bytes = stat.tx_bytes
+            
+            if key in self.prev_stats:
+                prev_rx, prev_tx, prev_time = self.prev_stats[key]
+                duration = time.time() - prev_time
+                if duration > 0:
+                    speed_tx = (tx_bytes - prev_tx) / duration
+                    speed_rx = (rx_bytes - prev_rx) / duration
+                    
+                    # RED ALERT LOGIC
+                    if speed_tx > CONGESTION_THRESHOLD or speed_rx > CONGESTION_THRESHOLD:
+                        max_speed = max(speed_tx, speed_rx) / 1000000
+                        print(f"{Colors.RED}[!] CONGESTION ALERT: Switch {dpid} Port {port_no} | Load: {max_speed:.2f} MB/s{Colors.RESET}")
+            
+            self.prev_stats[key] = (rx_bytes, tx_bytes, time.time())
 
-    # --- TOPOLOGY DISCOVERY (LLDP) ---
-    def _discovery_loop(self):
-        while True:
-            for dp in list(self.datapaths.values()):
-                for port in dp.ports.keys():
-                    if port <= dp.ofproto.OFPP_MAX:
-                        self._send_lldp(dp, port)
-            hub.sleep(3) # Scan every 3s
-
-    def _send_lldp(self, datapath, port):
+    # --- FEATURE 3: API & PRE/POST FLOW LOGGING ---
+    def change_route(self, dpid, destination_ip, new_port):
+        if dpid not in self.datapaths: return False
+        datapath = self.datapaths[dpid]
         parser = datapath.ofproto_parser
-        actions = [parser.OFPActionOutput(port)]
-        pkt = packet.Packet()
-        pkt.add_protocol(ethernet.ethernet(ethertype=ether_types.ETH_TYPE_LLDP,
-                                           src='00:00:00:00:00:00', dst=lldp.LLDP_MAC_NEAREST_BRIDGE))
-        chassis_id = lldp.ChassisID(subtype=lldp.ChassisID.SUB_LOCALLY_ASSIGNED,
-                                    chassis_id=dpid_to_str(datapath.id).encode('ascii'))
-        port_id = lldp.PortID(subtype=lldp.PortID.SUB_LOCALLY_ASSIGNED,
-                              port_id=str(port).encode('ascii'))
-        pkt.add_protocol(lldp.lldp([chassis_id, port_id, lldp.TTL(ttl=120), lldp.End()]))
-        pkt.serialize()
-        datapath.send_msg(parser.OFPPacketOut(datapath=datapath, buffer_id=datapath.ofproto.OFP_NO_BUFFER,
-                                              in_port=datapath.ofproto.OFPP_CONTROLLER, actions=actions, data=pkt.data))
+        
+        # 1. Determine destination MAC
+        dst_mac = self.static_arp_table.get(destination_ip)
+        if not dst_mac and ("10.0.100" in destination_ip or "10.0.200" in destination_ip): 
+            dst_mac = self.CLOUD_MAC
+        if not dst_mac: return False
 
-    # --- SWITCH CONNECTION ---
-    @set_ev_cls(ofp_event.EventOFPStateChange, [MAIN_DISPATCHER, DEAD_DISPATCHER])
-    def _state_change_handler(self, ev):
-        datapath = ev.datapath
-        if ev.state == MAIN_DISPATCHER:
-            if datapath.id:
-                self.datapaths[datapath.id] = datapath
-                self.network.add_node(datapath.id)
-                print(f" >> Switch {datapath.id:016x} Connected!")
-        elif ev.state == DEAD_DISPATCHER:
-            if datapath.id and datapath.id in self.datapaths:
-                del self.datapaths[datapath.id]
-                self.network.remove_node(datapath.id)
+        # 2. Log "BEFORE" (Current State)
+        # Note: Controller doesn't store old flows in RAM, we log the intent of change
+        print(f"\n{Colors.YELLOW}--- [COMMAND RECEIVED] MODIFY FLOW ---{Colors.RESET}")
+        print(f"Target Switch : {dpid}")
+        print(f"Destination   : {destination_ip}")
+        print(f"Old Action    : (Check Routing Table above)")
+        print(f"{Colors.GREEN}New Action    : OUTPUT PORT {new_port}{Colors.RESET}")
 
+        # 3. Install New Flow (Action)
+        match = parser.OFPMatch(eth_type=ether_types.ETH_TYPE_IP, ipv4_dst=destination_ip)
+        actions = [
+            parser.OFPActionSetField(eth_src=self.GATEWAY_MAC),
+            parser.OFPActionSetField(eth_dst=dst_mac), 
+            parser.OFPActionOutput(new_port)
+        ]
+        
+        # Priority 100 to override default flow
+        self.add_flow(datapath, 100, match, actions)
+        
+        print(f"{Colors.BLUE}--> Flow sent to switch successfully.{Colors.RESET}\n")
+        return True
+
+    # --- BASIC FUNCTIONS (KEPT AS IS) ---
     @set_ev_cls(ofp_event.EventOFPSwitchFeatures, CONFIG_DISPATCHER)
     def switch_features_handler(self, ev):
         datapath = ev.msg.datapath
+        self.datapaths[datapath.id] = datapath
+        ofproto = datapath.ofproto
         parser = datapath.ofproto_parser
         match = parser.OFPMatch()
-        actions = [parser.OFPActionOutput(datapath.ofproto.OFPP_CONTROLLER, datapath.ofproto.OFPCML_NO_BUFFER)]
+        actions = [parser.OFPActionOutput(ofproto.OFPP_CONTROLLER, ofproto.OFPCML_NO_BUFFER)]
         self.add_flow(datapath, 0, match, actions)
 
     def add_flow(self, datapath, priority, match, actions, buffer_id=None):
+        ofproto = datapath.ofproto
         parser = datapath.ofproto_parser
-        inst = [parser.OFPInstructionActions(datapath.ofproto.OFPIT_APPLY_ACTIONS, actions)]
+        inst = [parser.OFPInstructionActions(ofproto.OFPIT_APPLY_ACTIONS, actions)]
         mod = parser.OFPFlowMod(datapath=datapath, priority=priority, match=match, instructions=inst)
         datapath.send_msg(mod)
 
-    # --- PACKET PROCESSING ---
     @set_ev_cls(ofp_event.EventOFPPacketIn, MAIN_DISPATCHER)
     def _packet_in_handler(self, ev):
         msg = ev.msg
         datapath = msg.datapath
-        dpid = datapath.id
         in_port = msg.match['in_port']
         pkt = packet.Packet(msg.data)
         eth = pkt.get_protocols(ethernet.ethernet)[0]
+
+        if eth.ethertype == ether_types.ETH_TYPE_LLDP: return
         
-        if not eth: return
-        if eth.ethertype == ether_types.ETH_TYPE_LLDP: 
-            self._handle_lldp(datapath, in_port, pkt)
-            return
-
-        src_mac = eth.src
-        dst_mac = eth.dst
-
-        # 1. Global MAC Learning
-        self.mac_to_port.setdefault(dpid, {})
-        self.mac_to_port[dpid][src_mac] = in_port
-        self.mac_to_dpid[src_mac] = dpid 
-
-        # 2. ARP Processing
+        # Handle ARP
         if eth.ethertype == ether_types.ETH_TYPE_ARP:
-            self._handle_arp(datapath, in_port, eth, pkt.get_protocol(arp.arp), msg)
+            arp_pkt = pkt.get_protocols(arp.arp)[0]
+            if arp_pkt.opcode == arp.ARP_REQUEST:
+                if arp_pkt.dst_ip.endswith('.254') or arp_pkt.dst_ip.endswith('.1'):
+                    self.send_arp_reply(datapath, in_port, arp_pkt.src_mac, self.GATEWAY_MAC, arp_pkt.dst_ip, arp_pkt.src_ip)
+                else: self.do_flood(datapath, msg, in_port)
+            else: self.do_flood(datapath, msg, in_port)
             return
 
-        # 3. IPv4 Processing
+        # Handle IP Routing
         if eth.ethertype == ether_types.ETH_TYPE_IP:
-            self._handle_ipv4(datapath, msg, pkt.get_protocol(ipv4.ipv4), in_port, eth)
-            return
+            ip_pkt = pkt.get_protocols(ipv4.ipv4)[0]
+            self.handle_ip_routing(datapath, in_port, ip_pkt, msg)
 
-    # --- HANDLERS ---
-    def _handle_lldp(self, datapath, in_port, pkt):
-        try:
-            lldp_pkt = pkt.get_protocol(lldp.lldp)
-            chassis = lldp_pkt.tlvs[0].chassis_id.decode('ascii')
-            port = lldp_pkt.tlvs[1].port_id.decode('ascii')
-            src_dpid = str_to_dpid(chassis)
-            src_port = int(port)
-            if src_dpid != datapath.id:
-                self.network.add_edge(src_dpid, datapath.id, src_port=src_port, dst_port=in_port)
-                self.network.add_edge(datapath.id, src_dpid, src_port=in_port, dst_port=src_port)
-        except: pass
-
-    def _handle_arp(self, datapath, in_port, eth, arp_pkt, msg):
-        src_ip = arp_pkt.src_ip
-        dst_ip = arp_pkt.dst_ip
-        self.ip_to_mac[src_ip] = eth.src
-
-        if arp_pkt.opcode == arp.ARP_REQUEST:
-            # Always reply with GW_MAC for any Gateway IP query
-            if dst_ip in self.GW_IPS:
-                self.send_arp_reply(datapath, in_port, self.GW_MAC, dst_ip, eth.src, src_ip)
-            # Reply with real MAC for known hosts
-            elif dst_ip in self.ip_to_mac:
-                self.send_arp_reply(datapath, in_port, self.ip_to_mac[dst_ip], dst_ip, eth.src, src_ip)
-            else:
-                self.flood_packet(msg)
-        elif arp_pkt.opcode == arp.ARP_REPLY:
-            self.flood_packet(msg)
-
-    def _handle_ipv4(self, datapath, msg, ip_pkt, in_port, eth):
+    def handle_ip_routing(self, datapath, in_port, ip_pkt, msg):
+        dpid = datapath.id
         dst_ip = ip_pkt.dst
-        src_ip = ip_pkt.src
         
-        # Determine Routing vs Switching
-        is_routing = (eth.dst == self.GW_MAC)
+        if dpid in self.routing_table:
+            subnet_key = ".".join(dst_ip.split('.')[:3])
+            routing_table = self.routing_table.get(dpid, {})
+            out_port = routing_table.get(subnet_key)
+            if not out_port: out_port = routing_table.get("default")
+            
+            if out_port:
+                dst_mac = self.static_arp_table.get(dst_ip)
+                if not dst_mac and ("10.0.100" in dst_ip or "10.0.200" in dst_ip): dst_mac = self.CLOUD_MAC
 
-        # Target MAC
-        final_dst_mac = eth.dst
-        if is_routing:
-            if dst_ip in self.ip_to_mac:
-                final_dst_mac = self.ip_to_mac[dst_ip]
-            else:
-                self.send_arp_request_flood(datapath, dst_ip)
-                return
+                if dst_mac:
+                    parser = datapath.ofproto_parser
+                    actions = []
+                    # Default Failover Logic (Priority 10)
+                    if dpid == 256 and ("10.0.100" in dst_ip): # G1
+                        group_id = 50
+                        if dpid not in self.groups_installed:
+                            self.add_failover_group(datapath, group_id, 1, 5)
+                            self.groups_installed[dpid] = True
+                        actions = [parser.OFPActionSetField(eth_src=self.GATEWAY_MAC),
+                                   parser.OFPActionSetField(eth_dst=dst_mac),
+                                   parser.OFPActionGroup(group_id)]
+                    elif dpid == 768 and ("10.0.200" in dst_ip): # G3
+                        group_id = 51
+                        if dpid not in self.groups_installed:
+                            self.add_failover_group(datapath, group_id, 3, 1)
+                            self.groups_installed[dpid] = True
+                        actions = [parser.OFPActionSetField(eth_src=self.GATEWAY_MAC),
+                                   parser.OFPActionSetField(eth_dst=dst_mac),
+                                   parser.OFPActionGroup(group_id)]
+                    else:
+                        actions = [parser.OFPActionSetField(eth_src=self.GATEWAY_MAC),
+                                   parser.OFPActionSetField(eth_dst=dst_mac),
+                                   parser.OFPActionOutput(out_port)]
+                    
+                    match = parser.OFPMatch(eth_type=ether_types.ETH_TYPE_IP, ipv4_dst=dst_ip)
+                    self.add_flow(datapath, 10, match, actions)
+                    
+                    data = msg.data if msg.buffer_id == datapath.ofproto.OFP_NO_BUFFER else None
+                    out = parser.OFPPacketOut(datapath=datapath, buffer_id=msg.buffer_id, in_port=in_port, actions=actions, data=data)
+                    datapath.send_msg(out)
+                else: self.do_flood(datapath, msg, in_port)
+            else: self.do_flood(datapath, msg, in_port)
+        else: self.do_flood(datapath, msg, in_port)
 
-        # Find Path
-        if final_dst_mac not in self.mac_to_dpid:
-            self.flood_packet(msg)
-            return
-        
-        dst_dpid = self.mac_to_dpid[final_dst_mac]
-        
-        # If dst is on same switch
-        if datapath.id == dst_dpid:
-            out_port = self.mac_to_port[datapath.id][final_dst_mac]
-        else:
-            try:
-                path = nx.shortest_path(self.network, datapath.id, dst_dpid)
-                next_hop = path[1]
-                out_port = self.network[datapath.id][next_hop]['src_port']
-            except:
-                self.flood_packet(msg)
-                return
-
-        actions = []
-        if is_routing:
-            actions.append(datapath.ofproto_parser.OFPActionSetField(eth_src=self.GW_MAC))
-            actions.append(datapath.ofproto_parser.OFPActionSetField(eth_dst=final_dst_mac))
-            actions.append(datapath.ofproto_parser.OFPActionDecNwTtl())
-        
-        actions.append(datapath.ofproto_parser.OFPActionOutput(out_port))
-        
-        match = datapath.ofproto_parser.OFPMatch(in_port=in_port, eth_dst=eth.dst, eth_type=0x0800, ipv4_src=src_ip, ipv4_dst=dst_ip)
-        self.add_flow(datapath, 1, match, actions)
-        self._packet_out(datapath, msg, in_port, actions)
-
-    # --- HELPERS ---
-    def flood_packet(self, msg):
-        datapath = msg.datapath
+    def add_failover_group(self, datapath, group_id, main_port, backup_port):
         ofproto = datapath.ofproto
         parser = datapath.ofproto_parser
-        actions = [parser.OFPActionOutput(ofproto.OFPP_FLOOD)]
-        self._packet_out(datapath, msg, msg.match['in_port'], actions)
+        actions_main = [parser.OFPActionOutput(main_port)]
+        bucket_main = parser.OFPBucket(watch_port=main_port, watch_group=ofproto.OFPG_ANY, actions=actions_main)
+        actions_backup = [parser.OFPActionOutput(backup_port)]
+        bucket_backup = parser.OFPBucket(watch_port=backup_port, watch_group=ofproto.OFPG_ANY, actions=actions_backup)
+        req = parser.OFPGroupMod(datapath, ofproto.OFPGC_ADD, ofproto.OFPGT_FF, group_id, [bucket_main, bucket_backup])
+        datapath.send_msg(req)
+        self.logger.info(f"Failover Group {group_id} added on SW {datapath.id}")
 
-    def send_arp_reply(self, datapath, port, src_mac, src_ip, dst_mac, dst_ip):
+    def send_arp_reply(self, datapath, port, dst_mac, src_mac, src_ip, dst_ip):
+        ofproto = datapath.ofproto
+        parser = datapath.ofproto_parser
         pkt = packet.Packet()
         pkt.add_protocol(ethernet.ethernet(ethertype=ether_types.ETH_TYPE_ARP, dst=dst_mac, src=src_mac))
         pkt.add_protocol(arp.arp(opcode=arp.ARP_REPLY, src_mac=src_mac, src_ip=src_ip, dst_mac=dst_mac, dst_ip=dst_ip))
         pkt.serialize()
-        actions = [datapath.ofproto_parser.OFPActionOutput(port)]
-        self._packet_out(datapath, None, datapath.ofproto.OFPP_CONTROLLER, actions, data=pkt.data)
+        actions = [parser.OFPActionOutput(port)]
+        datapath.send_msg(parser.OFPPacketOut(datapath=datapath, buffer_id=ofproto.OFP_NO_BUFFER, in_port=ofproto.OFPP_CONTROLLER, actions=actions, data=pkt.data))
 
-    def send_arp_request_flood(self, datapath, target_ip):
-        # Broadcast ARP Request to find unknown IP
-        pkt = packet.Packet()
-        pkt.add_protocol(ethernet.ethernet(ethertype=ether_types.ETH_TYPE_ARP, dst='ff:ff:ff:ff:ff:ff', src=self.GW_MAC))
-        pkt.add_protocol(arp.arp(opcode=arp.ARP_REQUEST, src_mac=self.GW_MAC, src_ip='10.0.100.1', dst_mac='00:00:00:00:00:00', dst_ip=target_ip))
-        pkt.serialize()
+    def do_flood(self, datapath, msg, in_port):
         actions = [datapath.ofproto_parser.OFPActionOutput(datapath.ofproto.OFPP_FLOOD)]
-        self._packet_out(datapath, None, datapath.ofproto.OFPP_CONTROLLER, actions, data=pkt.data)
+        datapath.send_msg(datapath.ofproto_parser.OFPPacketOut(datapath=datapath, buffer_id=msg.buffer_id, in_port=in_port, actions=actions, data=msg.data))
 
-    def _packet_out(self, datapath, msg, in_port, actions, data=None):
-        if msg: data = msg.data
-        if not data: return
-        out = datapath.ofproto_parser.OFPPacketOut(datapath=datapath, buffer_id=datapath.ofproto.OFP_NO_BUFFER, in_port=in_port, actions=actions, data=data)
-        datapath.send_msg(out)
+class RestRouterController(ControllerBase):
+    def __init__(self, req, link, data, **config):
+        super(RestRouterController, self).__init__(req, link, data, **config)
+        self.app = data[simple_switch_instance_name]
+
+    @route('router', url, methods=['POST'], requirements={'dpid': '[0-9]+'})
+    def set_route(self, req, **kwargs):
+        dpid = int(kwargs['dpid'])
+        try: body = req.json if req.body else {}
+        except ValueError: return Response(status=400, body=b"Invalid JSON")
+        success = self.app.change_route(dpid, body.get('dest'), int(body.get('port')))
+        return Response(status=200, body=b"Route Changed") if success else Response(status=404, body=b"Failed")

@@ -1,0 +1,7 @@
+*) Traffic 1:
+cloud: iperf -s -u -i 1
+h1: iperf -c 10.0.100.2 -u -b 5M -t 60
+h6: ping 10.0.100.2
+Flow_Case 2: 
+curl -X POST -d '{"dest": "10.0.100.2", "port": 3}' http://localhost:8080/router/768
+curl -X POST -d '{"dest": "10.0.100.2", "port": 5}' http://localhost:8080/router/256
